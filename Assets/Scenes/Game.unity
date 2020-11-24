@@ -675,6 +675,7 @@ GameObject:
   - component: {fileID: 1552049753}
   - component: {fileID: 1552049756}
   - component: {fileID: 1552049755}
+  - component: {fileID: 1552049757}
   m_Layer: 0
   m_Name: SoyBoy
   m_TagString: Untagged
@@ -788,6 +789,25 @@ Rigidbody2D:
   m_SleepingMode: 1
   m_CollisionDetection: 0
   m_Constraints: 0
+--- !u!95 &1552049757
+Animator:
+  serializedVersion: 3
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1552049752}
+  m_Enabled: 1
+  m_Avatar: {fileID: 0}
+  m_Controller: {fileID: 9100000, guid: fcb1a70874fc33340a8dde59b54c9658, type: 2}
+  m_CullingMode: 0
+  m_UpdateMode: 0
+  m_ApplyRootMotion: 0
+  m_LinearVelocityBlending: 0
+  m_WarningMessage: 
+  m_HasTransformHierarchy: 1
+  m_AllowConstantClipSamplingOptimization: 1
+  m_KeepAnimatorControllerStateOnDisable: 0
 --- !u!1 &1766400524
 GameObject:
   m_ObjectHideFlags: 0
