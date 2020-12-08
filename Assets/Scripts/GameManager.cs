@@ -11,6 +11,8 @@ using System.Runtime.Serialization.Formatters.Binary;
 
 public class GameManager : MonoBehaviour
 {
+    public GameObject buttonPrefab;
+    private string selectedLevel;
     public string playerName;
     public static GameManager instance;
 
@@ -31,6 +33,7 @@ public class GameManager : MonoBehaviour
     void Start()
     {
         SceneManager.sceneLoaded += OnSceneLoaded;
+        DiscoverLevels();
     }
 
     // Update is called once per frame
@@ -107,5 +110,53 @@ public class GameManager : MonoBehaviour
         {
             DisplayPreviousTimes();
         }
+    }
+
+    private void SetLevelName(string levelFilePath)
+    {
+        selectedLevel = levelFilePath;
+        SceneManager.LoadScene("Game");
+    }
+
+    private void DiscoverLevels()
+    {
+        var levelPanelRectTransform = GameObject.Find("LevelItemsPanel").GetComponent<RectTransform>();
+
+        var levelFiles = Directory.GetFiles(Application.dataPath, "*.json");
+
+        var yOffset = 0f;
+        
+        for(var i = 0; i < levelFiles.Length; i++)
+        {
+            if (i== 0)
+            {
+                yOffset = -30;
+            }
+            else
+            {
+                yOffset -= 65f;
+            }
+
+            var levelFile = levelFiles[i];
+            var levelName = Path.GetFileName(levelFile);
+
+            var levelButtonObj = (GameObject)Instantiate(buttonPrefab, Vector2.zero, Quaternion.identity);
+
+            var levelButtonRectTransform = levelButtonObj.GetComponent<RectTransform>();
+            levelButtonRectTransform.SetParent(levelPanelRectTransform, true);
+
+            levelButtonRectTransform.anchoredPosition = new Vector2(212.5f, yOffset);
+
+            var levelButtonText = levelButtonObj.transform.GetChild(0).GetComponent<Text>();
+
+            levelButtonText.text = levelName;
+
+            var levelButton = levelButtonObj.GetComponent<Button>();
+            levelButton.onClick.AddListener(delegate { SetLevelName(levelFile); });
+
+            levelPanelRectTransform.sizeDelta = new Vector2(levelPanelRectTransform.sizeDelta.x, 60f * i);
+        }
+
+        levelPanelRectTransform.offsetMax = new Vector2(levelPanelRectTransform.offsetMax.x, 0f);
     }
 }
