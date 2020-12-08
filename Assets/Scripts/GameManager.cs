@@ -39,7 +39,7 @@ public class GameManager : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        
+
     }
 
     public void RestartLevel(float delay)
@@ -98,17 +98,24 @@ public class GameManager : MonoBehaviour
 
         timesLabel.text = "BEST TIMES \n";
 
-        foreach(var time in topThree)
+        foreach (var time in topThree)
         {
             timesLabel.text += time.entryDate.ToShortDateString() + ": " + time.time + "\n";
         }
     }
 
-    private void OnSceneLoaded(Scene scene, LoadSceneMode loadSceneMode)
+    private void OnSceneLoaded(Scene scene, LoadSceneMode loadsceneMode)
     {
-        if(scene.name == "Game")
+        if (!string.IsNullOrEmpty(selectedLevel)
+        && scene.name == "Game")
         {
+            Debug.Log("Loading level content for: " + selectedLevel);
+            LoadLevelContent();
             DisplayPreviousTimes();
+        }
+        if (scene.name == "Menu")
+        {
+            DiscoverLevels();
         }
     }
 
@@ -125,10 +132,10 @@ public class GameManager : MonoBehaviour
         var levelFiles = Directory.GetFiles(Application.dataPath, "*.json");
 
         var yOffset = 0f;
-        
-        for(var i = 0; i < levelFiles.Length; i++)
+
+        for (var i = 0; i < levelFiles.Length; i++)
         {
-            if (i== 0)
+            if (i == 0)
             {
                 yOffset = -30;
             }
@@ -158,5 +165,64 @@ public class GameManager : MonoBehaviour
         }
 
         levelPanelRectTransform.offsetMax = new Vector2(levelPanelRectTransform.offsetMax.x, 0f);
+    }
+
+    private void LoadLevelContent()
+    {
+        var existingLevelRoot = GameObject.Find("Level");
+        Destroy(existingLevelRoot);
+        var levelRoot = new GameObject("Level");
+
+     
+        var levelFileJsonContent = File.ReadAllText(selectedLevel);
+        var levelData = JsonUtility.FromJson<LevelDataRepresentation>(
+         levelFileJsonContent);
+        
+        foreach (var li in levelData.levelItems)
+        {
+           
+            var pieceResource =
+            Resources.Load("Prefabs/" + li.prefabName);
+            if (pieceResource == null)
+            {
+                Debug.LogError("Cannot find resource: " + li.prefabName);
+            }
+            
+            var piece = (GameObject)Instantiate(pieceResource,
+            li.position, Quaternion.identity);
+            var pieceSprite = piece.GetComponent<SpriteRenderer>();
+            if (pieceSprite != null)
+            {
+                pieceSprite.sortingOrder = li.spriteOrder;
+                pieceSprite.sortingLayerName = li.spriteLayer;
+                pieceSprite.color = li.spriteColor;
+            }
+          
+            piece.transform.parent = levelRoot.transform; 
+            piece.transform.position = li.position;
+            piece.transform.rotation = Quaternion.Euler(
+            li.rotation.x, li.rotation.y, li.rotation.z);
+            piece.transform.localScale = li.scale;
+        }
+
+        var SoyBoy = GameObject.Find("SoyBoy");
+        SoyBoy.transform.position = levelData.playerStartPosition;
+        Camera.main.transform.position = new Vector3(SoyBoy.transform.position.x, SoyBoy.transform.position.y, Camera.main.transform.position.z);
+
+        // 1
+        var camSettings = FindObjectOfType<CameraLerpToTransform>();
+        // 2
+        if (camSettings != null)
+        {
+           // camSettings.cameraZDepth = levelData.cameraSettings.cameraZDepth;
+            camSettings.camTarget = GameObject.Find(
+            levelData.cameraSettings.cameraTrackTarget).transform;
+            camSettings.maxX = levelData.cameraSettings.maxX;
+            camSettings.maxY = levelData.cameraSettings.maxY;
+            camSettings.minX = levelData.cameraSettings.minX;
+            camSettings.minY = levelData.cameraSettings.minY;
+            camSettings.trackingSpeed =
+            levelData.cameraSettings.trackingSpeed;
+        }
     }
 }
