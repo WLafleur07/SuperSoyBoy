@@ -30,7 +30,7 @@ public class GameManager : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        
+        SceneManager.sceneLoaded += OnSceneLoaded;
     }
 
     // Update is called once per frame
@@ -83,6 +83,29 @@ public class GameManager : MonoBehaviour
         {
             times.Add(newTime);
             bFormatter.Serialize(file, times);
+        }
+    }
+
+    public void DisplayPreviousTimes()
+    {
+        var times = LoadPreviousTimes();
+        var topThree = times.OrderBy(time => time.time).Take(3);
+
+        var timesLabel = GameObject.Find("PreviousTimes").GetComponent<Text>();
+
+        timesLabel.text = "BEST TIMES \n";
+
+        foreach(var time in topThree)
+        {
+            timesLabel.text += time.entryDate.ToShortDateString() + ": " + time.time + "\n";
+        }
+    }
+
+    private void OnSceneLoaded(Scene scene, LoadSceneMode loadSceneMode)
+    {
+        if(scene.name == "Game")
+        {
+            DisplayPreviousTimes();
         }
     }
 }
