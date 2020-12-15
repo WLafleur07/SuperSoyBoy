@@ -112,7 +112,7 @@ public class GameManager : MonoBehaviour
             timesLabel.text += time.entryDate.ToShortDateString() + ": " + time.time + "\n";
         }
     }
-    
+
 
     private void OnSceneLoaded(Scene scene, LoadSceneMode loadsceneMode)
     {
@@ -183,21 +183,21 @@ public class GameManager : MonoBehaviour
         Destroy(existingLevelRoot);
         var levelRoot = new GameObject("Level");
 
-     
+
         var levelFileJsonContent = File.ReadAllText(selectedLevel);
         var levelData = JsonUtility.FromJson<LevelDataRepresentation>(
          levelFileJsonContent);
-        
+
         foreach (var li in levelData.levelItems)
         {
-           
+
             var pieceResource =
             Resources.Load("Prefabs/" + li.prefabName);
             if (pieceResource == null)
             {
                 Debug.LogError("Cannot find resource: " + li.prefabName);
             }
-            
+
             var piece = (GameObject)Instantiate(pieceResource,
             li.position, Quaternion.identity);
             var pieceSprite = piece.GetComponent<SpriteRenderer>();
@@ -207,8 +207,8 @@ public class GameManager : MonoBehaviour
                 pieceSprite.sortingLayerName = li.spriteLayer;
                 pieceSprite.color = li.spriteColor;
             }
-          
-            piece.transform.parent = levelRoot.transform; 
+
+            piece.transform.parent = levelRoot.transform;
             piece.transform.position = li.position;
             piece.transform.rotation = Quaternion.Euler(
             li.rotation.x, li.rotation.y, li.rotation.z);
@@ -224,7 +224,7 @@ public class GameManager : MonoBehaviour
         // 2
         if (camSettings != null)
         {
-           // camSettings.cameraZDepth = levelData.cameraSettings.cameraZDepth;
+            // camSettings.cameraZDepth = levelData.cameraSettings.cameraZDepth;
             camSettings.camTarget = GameObject.Find(
             levelData.cameraSettings.cameraTrackTarget).transform;
             camSettings.maxX = levelData.cameraSettings.maxX;
